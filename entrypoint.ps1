@@ -14,7 +14,7 @@ $files = @("helper.ps1", "main.ps1", "CreateADUser.ps1", "CreateSharedMailbox.ps
 
 # Download each file
 foreach ($file in $files) {
-    Invoke-WebRequest -Uri ($baseUrl + $file) -OutFile (Join-Path -Path $directory -ChildPath $file)
+    Invoke-WebRequest -Uri ($baseUrl + $file) -OutFile (Join-Path -Path "./$directory" -ChildPath $file)
 }
 
 # Dot-source main.ps1
