@@ -94,7 +94,8 @@ function Main {
     Write-Host ""
 
     $UserPrincipalName = az ad signed-in-user show --query "userPrincipalName"
-
+    
+    Connect-AzureAD
     Connect-ExchangeOnline
 
     do {

@@ -29,8 +29,6 @@ function Get-ValidEmail {
 }
 
 function Get-AvailableDomains{
-    Connect-AzureAD
-
     # Get all verified domains for the organization
     $domains = Get-AzureADDomain
 
