@@ -50,7 +50,7 @@ function Ask-NotificationMethod {
         Param
         (
             [Parameter(Mandatory=$true, Position=0)]
-            [string] $SourceMailbox,
+            [string] $SourceMailbox
         )
     
     do {
