@@ -3,7 +3,7 @@ function Setup-NotificationMethod {
         Param
         (
             [Parameter(Mandatory=$true, Position=0)]
-            [string] $SourceMailbox,
+            [string] $SourceMailbox
         )
 
     # Step 1: Get and verify source mailbox
