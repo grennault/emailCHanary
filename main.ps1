@@ -95,7 +95,14 @@ function Main {
 
     $UserPrincipalName = az ad signed-in-user show --query "userPrincipalName"
     
-    Connect-AzureAD
+    if (-not (Get-Module -ListAvailable -Name AzureAD)) {
+    Write-Error "AzureAD module is not available."
+    } else {
+        Import-Module AzureAD
+        Write-Output "AzureAD module imported successfully."
+        Connect-AzureAD
+    }
+    
     Connect-ExchangeOnline
 
     do {
