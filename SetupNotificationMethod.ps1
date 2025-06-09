@@ -59,7 +59,7 @@ function Setup-NotificationMethod {
     # Step 3: Create mail contact
     Write-Host "`n=== STEP 3: External Contact ===" -ForegroundColor Cyan
     do {
-        $ContactName = Read-Host "Enter a display name for the contact (e.g., Kaourintin Gmail)"
+        $ContactName = Read-Host "Enter a display name for the contact (e.g., Your Gmail)"
         $ExternalEmail = Get-ValidEmail -PromptMessage "Enter the external email address to forward TO"
 
         Write-Host "`nCreating mail contact:" -ForegroundColor Yellow
