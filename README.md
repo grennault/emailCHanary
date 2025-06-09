@@ -48,7 +48,7 @@ Think of it as a tripwire for your cloud-based email clients. If someone send an
 3. Execute the below command:
 
 ```
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary/main/entrypoint.ps1" -OutFile "entrypoint.ps1"; & "entrypoint.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary/main/entrypoint.ps1" -OutFile "entrypoint.ps1"; & "./entrypoint.ps1"
 ```
 
 4. Follow the instructions
