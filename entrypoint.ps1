@@ -2,7 +2,7 @@
 
 # Define the directory and GitHub URL
 $directory = "emailCHanary"
-$baseUrl = "https://raw.githubusercontent.com/grennault/$directory/blob/main/"
+$baseUrl = "https://raw.githubusercontent.com/grennault/$directory/refs/heads/main/"
 
 # Create the directory if it doesn't exist
 if (-Not (Test-Path -Path $directory)) {
@@ -14,7 +14,7 @@ $files = @("helper.ps1", "main.ps1", "CreateADUser.ps1", "CreateSharedMailbox.ps
 
 # Download each file
 foreach ($file in $files) {
-    Invoke-WebRequest -Uri ($baseUrl + $file) -OutFile (Join-Path -Path "./$directory" -ChildPath $file)
+    Invoke-WebRequest -Uri ($baseUrl + $file) -OutFile (Join-Path -Path $directory -ChildPath $file)
 }
 
 # Dot-source main.ps1
