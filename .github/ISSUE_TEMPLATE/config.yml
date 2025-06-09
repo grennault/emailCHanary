@@ -1,0 +1,24 @@
+# .github/ISSUE_TEMPLATE/config.yml
+
+# Disable the default blank issue template
+blank_issues_enabled: false  
+
+# Automatically assign 'greenault' to new issues
+assignees:
+  - greenault
+
+# Define the issue templates
+templates:
+  - name: "Bug Report"
+    description: "Use this template for reporting bugs in the project."
+    labels:
+      - bug
+      - want help
+    template: "bug_report.md"  # Reference the markdown template directly
+
+  - name: "Feature Request"
+    description: "Use this template for suggesting new features or enhancements."
+    labels:
+      - feat request
+      - want help
+    template: "feature_request.md"  # Reference the markdown template directly
