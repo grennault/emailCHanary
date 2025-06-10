@@ -60,7 +60,7 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
 
     Create a shared mailbox:
 
-      E.g.
+      E.g. with Powershell:
 
         ```powershell
         New-Mailbox -Shared
@@ -69,7 +69,13 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
             -PrimarySmtpAddress $SharedMailboxEmail
         ```
 
+      E.g. In [EAC](https://admin.cloud.microsoft) [with UI](https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes#use-the-eac-to-create-a-shared-mailbox):
+
+      ![Create shared mailbox](./img/createSharedMailbox.png)
+
     Ensure GAL visibility is enabled so that the shared email address is visible for user in your organization
+
+    ![Verify GAL visibility](./img/verifyGALVisibility.png)
 
     __OR__
 
@@ -89,6 +95,10 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
     Add an Outlook Exchange licence to the user (to obtain a working email address)
 
 2. Add forwarding rule from the previously created canaray email to a monitoring email
+
+    E.g. In [EAC](https://admin.cloud.microsoft) [with UI](https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-user-mailboxes/configure-email-forwarding):
+
+    ![Add forwarding rule](./img/addForwardingRule.png)
 
 ---
 
