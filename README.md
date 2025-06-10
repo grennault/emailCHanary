@@ -38,7 +38,7 @@ Think of it as a tripwire for your cloud-based email clients. If someone send an
 
 ##### Fast installation
 
-> **IMPORTANT: This script only supports to be executed as a User in the Azure Portal Powershell terminal in a browser. You need to have sufficient privilege to create shared mailbox or AD User (i.e. the canaray mailbox) and to add a forwarding rule to it (to some monitoring email addresses). This is not recommended or please review the script [script.ps1](./script.ps1) before executing it.**
+> **IMPORTANT: This script only supports to be executed as a User in the Azure Portal Powershell terminal in a browser. You need to have sufficient privilege to create shared mailbox or AD User (i.e. the canaray mailbox) and to add a forwarding rule to it (to some monitoring email addresses). This is not recommended or please review the scripts [entrypoint.ps1](./entrypoint.ps1) before executing it.**
 
 1. Open [Azure Portal](https://portal.azure.com/#home)
 2. Open the Azure Powershell:
@@ -60,7 +60,9 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
 
     Create a shared mailbox:
 
-        ```
+      E.g.
+
+        ```powershell
         New-Mailbox -Shared
             -Name $SharedMailboxName
             -Alias $SharedMailboxAlias
@@ -73,14 +75,18 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
 
     Create an AD user:
 
-        ```
-        New-Mailbox -Shared
-            -Name $SharedMailboxName
-            -Alias $SharedMailboxAlias
-            -PrimarySmtpAddress $SharedMailboxEmail
+      E.g. 
+
+        ```powershell
+        New-AzureADUser -DisplayName "John Doe" -UserPrincipalName 
+            "johndoe@yourdomain.onmicrosoft.com" 
+            -EmailAddress "johndoe@example.com"
+            -AccountEnabled $true 
+            -PasswordProfile (New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile 
+            -Property @{Password = "YourPasswordHere"})
         ```
 
-2. Add an Outlook Exchange licence to the user (to obtain a working email address)
+    Add an Outlook Exchange licence to the user (to obtain a working email address)
 
 2. Add forwarding rule from the previously created canaray email to a monitoring email
 
