@@ -38,9 +38,14 @@ Think of it as a tripwire for your cloud-based email clients. If someone send an
 
 ##### Fast installation
 
-> **IMPORTANT: This script only supports to be executed as a User in the Azure Portal Powershell terminal in a browser. You need to have sufficient privilege to create shared mailbox or AD User (i.e. the canaray mailbox) and to add a forwarding rule to it (to some monitoring email addresses). This is not recommended or please review the script [script.ps1](./script.ps1) before executing it.**
+> **IMPORTANT: This script only supports to be executed as a User in the Azure Portal Powershell terminal in a browser. You need to have sufficient privileges to create shared mailbox or AD User (i.e. the canaray mailbox) and to add a forwarding rule to it (to some monitoring email addresses). This is not recommended or please review the script [script.ps1](./script.ps1) before executing it.**
 
-1. Open [Azure Portal](https://portal.azure.com/#home)
+privileges (If you notice more rights are needed, please raise an issue or a PR!): 
+**"Exchange Administrator"**
+**User Administrator (Azure AD)** (If a user is created instead of a shared canary internal mailbox)$
+
+
+1. Open [Azure Portal](https://portal.azure.com/#home) or the exchange admin center https://admin.exchange.microsoft.com/#/
 2. Open the Azure Powershell:
 
 ![Open Azure Powershell](./img/openAzurePS.jpg)
