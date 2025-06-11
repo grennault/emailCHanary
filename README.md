@@ -47,7 +47,7 @@ Think of it as a tripwire for your cloud-based email clients. If someone send an
 
 3. Execute the below command:
 
-```
+```powershell
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary/main/entrypoint.ps1" -OutFile "entrypoint.ps1"; & "./entrypoint.ps1"
 ```
 
@@ -58,47 +58,47 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
 
 1. Create a canary shared mailbox __OR__ a canary AD user:
 
-    Create a shared mailbox:
+Create a shared mailbox:
 
-      E.g. with Powershell:
+E.g. with Powershell:
 
-        ```powershell
-        New-Mailbox -Shared
-            -Name $SharedMailboxName
-            -Alias $SharedMailboxAlias
-            -PrimarySmtpAddress $SharedMailboxEmail
-        ```
+```powershell
+New-Mailbox -Shared
+    -Name $SharedMailboxName
+    -Alias $SharedMailboxAlias
+    -PrimarySmtpAddress $SharedMailboxEmail
+```
 
-      E.g. In [EAC](https://admin.cloud.microsoft) [with UI](https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes#use-the-eac-to-create-a-shared-mailbox):
+E.g. In [EAC](https://admin.cloud.microsoft) [with UI](https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes#use-the-eac-to-create-a-shared-mailbox):
 
-      ![Create shared mailbox](./img/createSharedMailbox.png)
+![Create shared mailbox](./img/createSharedMailbox.png)
 
-    Ensure GAL visibility is enabled so that the shared email address is visible for user in your organization
+Ensure GAL visibility is enabled so that the shared email address is visible for user in your organization
 
-    ![Verify GAL visibility](./img/verifyGALVisibility.png)
+![Verify GAL visibility](./img/verifyGALVisibility.png)
 
-    __OR__
+ __OR__
 
-    Create an AD user:
+Create an AD user:
 
-      E.g. 
+E.g. 
 
-        ```powershell
-        New-AzureADUser -DisplayName "John Doe" -UserPrincipalName 
-            "johndoe@yourdomain.onmicrosoft.com" 
-            -EmailAddress "johndoe@example.com"
-            -AccountEnabled $true 
-            -PasswordProfile (New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile 
-            -Property @{Password = "YourPasswordHere"})
-        ```
+```powershell
+New-AzureADUser -DisplayName "John Doe" -UserPrincipalName 
+    "johndoe@yourdomain.onmicrosoft.com" 
+    -EmailAddress "johndoe@example.com"
+    -AccountEnabled $true 
+    -PasswordProfile (New-Object -TypeName Microsoft.Open.AzureAD.Model.PasswordProfile 
+    -Property @{Password = "YourPasswordHere"})
+```
 
-    Add an Outlook Exchange licence to the user (to obtain a working email address)
+Add an Outlook Exchange licence to the user (to obtain a working email address)
 
 2. Add forwarding rule from the previously created canaray email to a monitoring email
 
-    E.g. In [EAC](https://admin.cloud.microsoft) [with UI](https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-user-mailboxes/configure-email-forwarding):
+E.g. In [EAC](https://admin.cloud.microsoft) [with UI](https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-user-mailboxes/configure-email-forwarding):
 
-    ![Add forwarding rule](./img/addForwardingRule.png)
+s![Add forwarding rule](./img/addForwardingRule.png)
 
 ---
 
