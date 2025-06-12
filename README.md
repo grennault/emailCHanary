@@ -11,45 +11,7 @@
 
 As date of today, **EmailCHanary** is a lightweight and stealthy experiment script designed to **detect compromised Microsoft Azure email clients**. It works by deploying decoy (canary) email addresses that alert you when they receive email, signaling potential user account compromise.
 
-Think of it as a tripwire for your cloud-based email clients. If someone send an email to the email address bait, you'll know.
-
-## Python Implementation
-
-The Python implementation provides a more structured approach to creating email canaries. It supports both internal shared mailboxes and external contacts.
-
-### Prerequisites
-- Python 3.6 or higher
-- PowerShell 7.0 or higher
-- Exchange Online PowerShell module
-- Microsoft Graph PowerShell module
-
-### Installation
-1. Install required Python packages:
-```bash
-pip install -r requirements.txt
-```
-
-2. Install required PowerShell modules:
-```powershell
-Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber
-Install-Module -Name Microsoft.Graph -Force -AllowClobber
-```
-
-### Usage
-Run the Python script:
-```bash
-python create_shared_mailbox.py
-```
-
-The script will guide you through:
-1. Creating an internal shared mailbox with forwarding
-2. Creating an external contact
-3. Setting up GAL visibility
-
-### Current Limitations
-- Authentication requires multiple popups (one per command)
-- Forwarding is limited to single email address
-- Group forwarding is not implemented
+Think of it as a tripwire for your cloud-based email clients. If someone send an email to the email address bait, you’ll know.
 
 ---
 
