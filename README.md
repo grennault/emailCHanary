@@ -36,7 +36,9 @@ Think of it as a tripwire for your cloud-based email clients. If someone send an
 
 ### Installation
 
-##### Fast installation
+#### Fast installation
+
+##### Via Azure powershell script 
 
 > **IMPORTANT: This script only supports to be executed as a User in the Azure Portal Powershell terminal in a browser. You need to have sufficient privilege to create shared mailbox or AD User (i.e. the canaray mailbox) and to add a forwarding rule to it (to some monitoring email addresses). This is not recommended or please review the scripts [entrypoint.ps1](./entrypoint.ps1) before executing it.**
 
@@ -53,8 +55,44 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/grennault/emailCHanary
 
 4. Follow the instructions
 
+##### Via 🐍 Python script 
 
-##### Manual installation
+> The Python implementation provides a more structured approach to creating email canaries. It supports both internal shared mailboxes and external contacts.
+
+0. Prerequisites
+- Python 3.6 or higher
+- PowerShell 7.0 or higher
+- Exchange Online PowerShell module
+- Microsoft Graph PowerShell module
+
+1. Install required Python packages:
+```bash
+pip install -r requirements.txt
+```
+
+2. Install required PowerShell modules:
+```powershell
+Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber
+Install-Module -Name Microsoft.Graph -Force -AllowClobber
+```
+
+3. Run the Python script:
+```bash
+python create_shared_mailbox.py
+```
+
+The script will guide you through:
+1. Creating an internal shared mailbox with forwarding
+2. Creating an external contact
+3. Setting up GAL visibility
+
+Current Limitations
+- Authentication requires multiple popups (one per command)
+- Forwarding is limited to single email address
+- Group forwarding is not implemented
+
+
+#### Manual installation
 
 1. Create a canary shared mailbox __OR__ a canary AD user:
 
@@ -104,11 +142,11 @@ s![Add forwarding rule](./img/addForwardingRule.png)
 
 ## Help us
 
-#### Support us
+### Support us
 
 <a href="https://www.buymeacoffee.com/grennault" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-#### Community & contact
+### Community & contact
 
 - [Github Discussion](https://github.com/grennault/emailCHanary/discussions): sharing feedbacks and asking questions.
 - [Github Issue](https://github.com/grennault/emailCHanary/issues): bugs reporting and feature requests.
@@ -119,7 +157,7 @@ s![Add forwarding rule](./img/addForwardingRule.png)
   <img src="https://contrib.rocks/image?repo=grennault/emailCHanary" />
 </a>
 
-#### Star History
+### Star History
 
 <a href="https://www.star-history.com/#grennault/emailCHanary&Timeline">
  <picture>
@@ -130,41 +168,3 @@ s![Add forwarding rule](./img/addForwardingRule.png)
 </a>
 
 ---
-
-## 🐍 Python Implementation
-
-The Python implementation provides a more structured approach to creating email canaries. It supports both internal shared mailboxes and external contacts.
-
-### Prerequisites
-- Python 3.6 or higher
-- PowerShell 7.0 or higher
-- Exchange Online PowerShell module
-- Microsoft Graph PowerShell module
-
-### Installation
-1. Install required Python packages:
-```bash
-pip install -r requirements.txt
-```
-
-2. Install required PowerShell modules:
-```powershell
-Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber
-Install-Module -Name Microsoft.Graph -Force -AllowClobber
-```
-
-### Usage
-Run the Python script:
-```bash
-python create_shared_mailbox.py
-```
-
-The script will guide you through:
-1. Creating an internal shared mailbox with forwarding
-2. Creating an external contact
-3. Setting up GAL visibility
-
-### Current Limitations
-- Authentication requires multiple popups (one per command)
-- Forwarding is limited to single email address
-- Group forwarding is not implemented
