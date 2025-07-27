@@ -1,10 +1,11 @@
 # -------------------------------
 # emailCHanary Azure Script
 # Made by: G. Renault & K. Tamine
-# Upload this azure powershell script in your Azure Portal terminal (Upload file) and execute it ./script.ps1
+# Upload this azure powershell script in your Azure Portal terminal (Upload file) and execute it ./main.ps1
 # -------------------------------
 
 # Dot-source other scripts
+. "$PSScriptRoot\common.ps1"
 . "$PSScriptRoot\helper.ps1"
 . "$PSScriptRoot\CreateADUser.ps1"
 . "$PSScriptRoot\CreateSharedMailbox.ps1"
@@ -35,11 +36,11 @@ function Print-WelcomeMessage {
 "@
     Write-Host $welcome -ForegroundColor Red
     $welcome = @"
-Welcome to the emailCHanaray script.
+Welcome to the emailCHanary script.
 
 IMPORTANT:
 This script only supports to be executed as a User in the Azure Portal Powershell terminal in a browser.
-You need to have sufficient privilege to create shared mailbox (the canaray mailbox) and to add a forwarding rule to it (to some monitoring email addresses).
+You need to have sufficient privilege to create shared mailbox (the canary mailbox) and to add a forwarding rule to it (to some monitoring email addresses).
 
 "@
     Write-Output $welcome
@@ -47,81 +48,177 @@ You need to have sufficient privilege to create shared mailbox (the canaray mail
 
 # Function to ask notification method
 function Ask-NotificationMethod {
-        Param
-        (
-            [Parameter(Mandatory=$true, Position=0)]
-            [string] $SourceMailbox
-        )
+    param (
+        [Parameter(Mandatory=$true, Position=0)]
+        [string] $SourceMailbox
+    )
     
     do {
-        Write-Output "How to notify of received emails on email caaray decoy?"
-        Write-Output "1. By email (only one supported for now)"
-        Write-Output "2. By Teams notification"
-        Write-Output "3. By Slack notification"
+        Write-Log -Message "How to notify of received emails on email canary decoy?" -Level "Info"
+        Write-Host "1. By email"
+        Write-Host "2. By Teams notification"
+        Write-Host "3. By Slack notification"
 
-        $option = Read-Host "Please select an option (1 or 2)"
+        $option = Read-Host "Please select an option (1, 2, or 3)"
         switch ($option) {
-            "1" { 
-                Write-Output "You selected: By email" 
+            "1" {
+                Write-Log -Message "You selected: By email" -Level "Success"
                 Setup-NotificationMethod $SourceMailbox
                 return
             }
-            "2" { 
-                Write-Output "You selected: By Teams notification" 
-                Write-Output "We apologize but this is not yet supported. Please write a Github Issue to describe your needs."
+            "2" {
+                Write-Log -Message "You selected: By Teams notification" -Level "Success"
+                # Check if Exchange Online Management module is installed
+                if (-not (Get-Module -ListAvailable -Name ExchangeOnlineManagement)) {
+                    Write-Log -Message "Exchange Online Management module is required for Teams notifications." -Level "Warning"
+                    $installModule = Read-Host "Do you want to install the Exchange Online Management module? (y/n)"
+                    if ($installModule -eq "y") {
+                        try {
+                            Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber -Scope CurrentUser
+                            Write-Log -Message "Exchange Online Management module installed successfully." -Level "Success"
+                        } catch {
+                            Write-Log -Message "Failed to install Exchange Online Management module: $_" -Level "Error"
+                            $tryEmail = Read-Host "Would you like to use email notification instead? (y/n)"
+                            if ($tryEmail -eq "y") {
+                                Write-Log -Message "Switching to email notification." -Level "Info"
+                                Setup-NotificationMethod $SourceMailbox
+                                return
+                            }
+                            return
+                        }
+                    } else {
+                        $tryEmail = Read-Host "Would you like to use email notification instead? (y/n)"
+                        if ($tryEmail -eq "y") {
+                            Write-Log -Message "Switching to email notification." -Level "Info"
+                            Setup-NotificationMethod $SourceMailbox
+                            return
+                        }
+                        return
+                    }
+                }
+                
+                # Call the Teams notification setup function
+                Setup-TeamsNotification $SourceMailbox
+                return
             }
-            "3" { 
-                Write-Output "You selected: By Slack notification" 
-                Write-Output "We apologize but this is not yet supported. Please write a Github Issue to describe your needs."
+            "3" {
+                Write-Log -Message "You selected: By Slack notification" -Level "Success"
+                # Check if Exchange Online Management module is installed
+                if (-not (Get-Module -ListAvailable -Name ExchangeOnlineManagement)) {
+                    Write-Log -Message "Exchange Online Management module is required for Slack notifications." -Level "Warning"
+                    $installModule = Read-Host "Do you want to install the Exchange Online Management module? (y/n)"
+                    if ($installModule -eq "y") {
+                        try {
+                            Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber -Scope CurrentUser
+                            Write-Log -Message "Exchange Online Management module installed successfully." -Level "Success"
+                        } catch {
+                            Write-Log -Message "Failed to install Exchange Online Management module: $_" -Level "Error"
+                            $tryEmail = Read-Host "Would you like to use email notification instead? (y/n)"
+                            if ($tryEmail -eq "y") {
+                                Write-Log -Message "Switching to email notification." -Level "Info"
+                                Setup-NotificationMethod $SourceMailbox
+                                return
+                            }
+                            return
+                        }
+                    } else {
+                        $tryEmail = Read-Host "Would you like to use email notification instead? (y/n)"
+                        if ($tryEmail -eq "y") {
+                            Write-Log -Message "Switching to email notification." -Level "Info"
+                            Setup-NotificationMethod $SourceMailbox
+                            return
+                        }
+                        return
+                    }
+                }
+                
+                # Call the Slack notification setup function
+                Setup-SlackNotification $SourceMailbox
+                return
             }
-            default { Write-Output "Invalid selection. Please choose 1, 2 or 3." }
+            default { Write-Log -Message "Invalid selection. Please choose 1, 2, or 3." -Level "Warning" }
         }
-    } while ($option -ne "1")
+        
+        # If we get here, the user selected an unsupported option and didn't want to use email
+        $retry = Read-Host "Do you want to try again? (y/n)"
+        if ($retry -ne "y") {
+            Write-Log -Message "Notification setup cancelled." -Level "Warning"
+            return
+        }
+    } while ($true)
 }
 
 # Main function
 function Main {
     Print-WelcomeMessage
     
-    if ("User" -ne ((Get-AzContext).Account).Type) {
-        Write-Host "Executed using Managed Identity. Switching as a User... Please complete below steps"
-        Write-Host "Trying to login you with Connect-AzAccount command..." -ForegroundColor Yellow
-        Connect-AzAccount -UseDeviceAuthentication
-    }
-
-    Write-Host "You are logged in as:" -ForegroundColor Green
-    az ad signed-in-user show --query "userPrincipalName"
-    Write-Host ""
-
-    $UserPrincipalName = az ad signed-in-user show --query "userPrincipalName"
+    # Check and install required modules
+    $modulesOk = $true
+    $modulesOk = $modulesOk -and (Ensure-ModuleInstalled -ModuleName "Az" -MinimumVersion "9.0.0")
+    $modulesOk = $modulesOk -and (Ensure-ModuleInstalled -ModuleName "AzureAD" -MinimumVersion "2.0.0")
+    $modulesOk = $modulesOk -and (Ensure-ModuleInstalled -ModuleName "ExchangeOnlineManagement" -MinimumVersion "3.0.0")
     
-    if (-not (Get-Module -ListAvailable -Name AzureAD)) {
-    Write-Error "AzureAD module is not available."
+    if (-not $modulesOk) {
+        Write-Log -Message "One or more required modules could not be installed. The script may not function correctly." -Level "Error"
+        $continue = Read-Host "Do you want to continue anyway? (y/n)"
+        if ($continue -ne "y") {
+            Write-Log -Message "Script execution cancelled." -Level "Warning"
+            return
+        }
+    }
+    
+    # Check authentication
+    if (-not (Ensure-ServiceConnected -ServiceName "Azure")) {
+        Write-Log -Message "Cannot proceed without Azure authentication." -Level "Error"
+        return
+    }
+    
+    # Get and display current user
+    $currentUser = Get-CurrentUserPrincipalName
+    if ($currentUser) {
+        Write-Log -Message "You are logged in as: $currentUser" -Level "Success"
     } else {
-        Import-Module AzureAD
-        Write-Output "AzureAD module imported successfully."
-        Connect-AzureAD
+        Write-Log -Message "Could not determine current user." -Level "Warning"
     }
     
-    Connect-ExchangeOnline
-
+    # Connect to AzureAD
+    if (-not (Ensure-ServiceConnected -ServiceName "AzureAD")) {
+        Write-Log -Message "Cannot proceed without AzureAD authentication." -Level "Error"
+        return
+    }
+    
+    # Connect to Exchange Online
+    if (-not (Ensure-ServiceConnected -ServiceName "ExchangeOnline")) {
+        Write-Log -Message "Cannot proceed without Exchange Online authentication." -Level "Error"
+        return
+    }
+    
+    # Ask user for canary type
     do {
-        Write-Output "Should the email canary be a shared mailbox or an AD User (with Outlook Exchange Licence)"
-        Write-Output "1. Canaray as a shared mailbox (could be detected by attacker)"
-        Write-Output "2. Canary as an internal AD User (may imply some cost)"
+        Write-Log -Message "Should the email canary be a shared mailbox or an AD User (with Outlook Exchange Licence)" -Level "Info"
+        Write-Host "1. Canary as a shared mailbox (could be detected by attacker)"
+        Write-Host "2. Canary as an internal AD User (may imply some cost)"
 
         $option = Read-Host "Please select an option (1 or 2)"
         switch ($option) {
             "1" { 
-                Write-Output "You selected: Canaray as a shared mailbox " 
+                Write-Log -Message "You selected: Canary as a shared mailbox" -Level "Success"
                 $SourceMailbox = Create-SharedMailbox
+                if (-not $SourceMailbox) {
+                    Write-Log -Message "Failed to create shared mailbox. Cannot continue." -Level "Error"
+                    return
+                }
             }
             "2" { 
-                Write-Output "You selected: Canary as an internal AD User" 
-                Write-Output "Please note that this may induce some cost (cost of one user with Exchange Outlook Licence)"  -ForegroundColor Yellow
+                Write-Log -Message "You selected: Canary as an internal AD User" -Level "Success"
+                Write-Log -Message "Please note that this may induce some cost (cost of one user with Exchange Outlook Licence)" -Level "Warning"
                 $SourceMailbox = Create-ADUser
+                if (-not $SourceMailbox) {
+                    Write-Log -Message "Failed to create AD user. Cannot continue." -Level "Error"
+                    return
+                }
             }
-            default { Write-Output "Invalid selection. Please choose 1 or 2." }
+            default { Write-Log -Message "Invalid selection. Please choose 1 or 2." -Level "Warning" }
         }
     } while ($option -ne "1" -and $option -ne "2")
 
@@ -130,10 +227,10 @@ function Main {
 
 try {
     Main
-    Write-Host "Script succeeded! Canary mailbox and stealth forwarding rule set up." -ForegroundColor Green
+    Write-Log -Message "Script succeeded! Canary mailbox and stealth forwarding rule set up." -Level "Success"
 } catch {
-    Write-Host "Script failed. Please review the error below or create a Git Issue including this:" -ForegroundColor Red
-    Write-Output "An error occurred: $($_.Exception.GetType().FullName)"
+    Write-Log -Message "Script failed. Please review the error below or create a Git Issue including this:" -Level "Error"
+    Write-Log -Message "An error occurred: $($_.Exception.GetType().FullName)" -Level "Error"
     Write-Host $_
     Write-Host $_.ScriptStackTrace
 }
